@@ -1,0 +1,44 @@
+name: Run Python Script
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * *'  # 9:00 UTC diariamente
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run script
+        env:
+          OWN_API_KEY: ${{ secrets.OWN_API_KEY }}
+          OWN_ACCOUNT_SID: ${{ secrets.OWN_ACCOUNT_SID }}
+          OWN_AUTH_TOKEN: ${{ secrets.OWN_AUTH_TOKEN }}
+        run: python main.py
+
+      - name: Validate secrets
+        env:
+          OWN_API_KEY: ${{ secrets.OWN_API_KEY }}
+          OWN_ACCOUNT_SID: ${{ secrets.OWN_ACCOUNT_SID }}
+          OWN_AUTH_TOKEN: ${{ secrets.OWN_AUTH_TOKEN }}
+        run: |
+          if [ -z "$OWN_API_KEY" ]; then echo "OWN_API_KEY not set"; exit 1; fi
+          if [ -z "$OWN_ACCOUNT_SID" ]; then echo "OWN_ACCOUNT_SID not set"; exit 1; fi
+          if [ -z "$OWN_AUTH_TOKEN" ]; then echo "OWN_AUTH_TOKEN not set"; exit 1; fi
+          echo "All secrets are set!"
+
+      - run: python -m py_compile main.py
