@@ -3,7 +3,7 @@ name: Run Python Script
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 9 * * *'  # 9:00 UTC diariamente
+    - cron: '0 9 * * *'
 
 jobs:
   run:
@@ -23,13 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run script
-        env:
-          OWN_API_KEY: ${{ secrets.OWN_API_KEY }}
-          OWN_ACCOUNT_SID: ${{ secrets.OWN_ACCOUNT_SID }}
-          OWN_AUTH_TOKEN: ${{ secrets.OWN_AUTH_TOKEN }}
-        run: python main.py
-
+      # 👇 VALIDAR PRIMEIRO
       - name: Validate secrets
         env:
           OWN_API_KEY: ${{ secrets.OWN_API_KEY }}
@@ -41,4 +35,10 @@ jobs:
           if [ -z "$OWN_AUTH_TOKEN" ]; then echo "OWN_AUTH_TOKEN not set"; exit 1; fi
           echo "All secrets are set!"
 
-      - run: python -m py_compile main.py
+      # 👇 RODAR DEPOIS
+      - name: Run script
+        env:
+          OWN_API_KEY: ${{ secrets.OWN_API_KEY }}
+          OWN_ACCOUNT_SID: ${{ secrets.OWN_ACCOUNT_SID }}
+          OWN_AUTH_TOKEN: ${{ secrets.OWN_AUTH_TOKEN }}
+        run: python main.py
